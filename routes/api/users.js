@@ -4,6 +4,8 @@ const { check, validationResult } = require('express-validator/check');
 const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
 const User = require('../../models/User');
+const jwt = require('jsonwebtoken');
+const config = require('config');
 
 // @route POST api/users
 // @desc Register user
@@ -52,7 +54,7 @@ router.post(
         password,
       });
 
-      //  Encrypt password - using bcrypt
+      //  Encrypt password - using  bcrypt
 
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(password, salt);
@@ -61,7 +63,23 @@ router.post(
       await user.save();
 
       // Return JWT
-      res.send('User registered successfully');
+      const payload = {
+        user: {
+          id: user.id, // get the id of the user that got saved
+          // in mongoDb user id is "_id", mongoose allows to just write "id"
+        },
+      };
+      jwt.sign(
+        payload,
+        config.get('jwtSecret'),
+        { expiresIn: 360000 },
+        (err, token) => {
+          if (err) throw err;
+          res.json({ token });
+        }
+      );
+
+      //    res.send('User registered successfully');
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server error');
