@@ -6,6 +6,8 @@ import Register from './components/auth/Register';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import React, { Fragment, useEffect } from 'react';
 import Alert from './components/layout/Alert';
+import Dashboard from './components/dashboard/Dashboard';
+import PrivateRoute from './components/Routing/PrivateRoute';
 // Redux imports
 import { Provider } from 'react-redux';
 import store from '../src/store';
@@ -32,6 +34,7 @@ const App = () => {
             <Switch>
               <Route exact path='/register' component={Register} />
               <Route exact path='/login' component={Login} />
+              <PrivateRoute exact path='/dashboard' component={Dashboard} />
             </Switch>
           </section>
         </Fragment>
