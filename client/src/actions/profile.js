@@ -56,5 +56,3 @@ export const createProfile = (formData, history, edit = false) => async (
     });
   }
 };
-
-export default getCurrentProfile;
