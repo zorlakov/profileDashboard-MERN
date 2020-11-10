@@ -8,7 +8,7 @@ import Spinner from '../layout/Spinner';
 const Posts = ({ getPosts, post: { posts, loading } }) => {
   useEffect(() => {
     getPosts();
-  }, [getPosts]);
+  }, [getPosts, posts]);
 
   return loading ? (
     <Spinner />
@@ -18,16 +18,16 @@ const Posts = ({ getPosts, post: { posts, loading } }) => {
       <p className='lead'>
         <i className='fas fa-user'></i> Welcome to the community
       </p>
-      {/*    <div className='posts'>
+      {/*   <div className='posts'>
         {posts.map((post) => (
           <PostItem key={post._id} post={post} />
         ))}
       </div> */}
+
       {posts !== null && posts !== undefined ? (
         <div className='posts'>
           {posts.map((post) => (
             <PostItem key={post._id} post={post} />
-            // <p>Post text is: {post.text}</p>
           ))}
         </div>
       ) : (
