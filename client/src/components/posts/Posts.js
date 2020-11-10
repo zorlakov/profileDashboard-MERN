@@ -4,11 +4,12 @@ import { connect } from 'react-redux';
 import { getPosts } from '../../actions/post';
 import PostItem from './PostItem';
 import Spinner from '../layout/Spinner';
+import axios from 'axios';
 
 const Posts = ({ getPosts, post: { posts, loading } }) => {
   useEffect(() => {
     getPosts();
-  }, [getPosts, posts]);
+  }, [getPosts]);
 
   return loading ? (
     <Spinner />
