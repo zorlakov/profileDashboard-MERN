@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../../models/User');
 const jwt = require('jsonwebtoken');
 const config = require('config');
+const auth = require('../../middleware/auth');
 
 // @route POST api/users
 // @desc Register user
@@ -86,5 +87,32 @@ router.post(
     }
   }
 );
+
+// @route POST api/users/:user_id/follow
+// @desc Follow user
+// @access Private
+router.post('/:user_id/follow', auth, async (req, res) => {
+  try {
+    // First, find the user with user_id (if he exists)
+    // Logged in user: Add user with user_id to my list of followers
+    // User that you've followed: add yourself as their follower
+
+    const followedUser = await User.findOne({ _id: req.params.user_id });
+    if (!followedUser) return res.status(400).json({ msg: 'User not found' });
+    // console.log(`user id: ${req.user.id}`);
+    followedUser.followers.unshift(req.user.id);
+    followedUser.save();
+
+    const me = await User.findById(req.user.id);
+    //  console.log('me is:', me);
+    if (!me) return res.status(400).json({ msg: 'ERROR' });
+    me.following.unshift(req.params.user_id);
+    me.save();
+
+    res.json(me);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
 
 module.exports = router;
