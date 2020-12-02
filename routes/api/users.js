@@ -100,14 +100,59 @@ router.post('/:user_id/follow', auth, async (req, res) => {
     const followedUser = await User.findOne({ _id: req.params.user_id });
     if (!followedUser) return res.status(400).json({ msg: 'User not found' });
     // console.log(`user id: ${req.user.id}`);
-    followedUser.followers.unshift(req.user.id);
+    followedUser.followers.unshift({ user: req.user.id });
     followedUser.save();
 
     const me = await User.findById(req.user.id);
     //  console.log('me is:', me);
     if (!me) return res.status(400).json({ msg: 'ERROR' });
-    me.following.unshift(req.params.user_id);
+    me.following.unshift({ user: req.params.user_id });
     me.save();
+
+    res.json(me);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+// @route DELETE api/users/:user_id/unfollow
+// @desc Unfollow user
+// @access Private
+router.delete('/:user_id/unfollow', auth, async (req, res) => {
+  try {
+    // First, find the user with user_id (if he exists)
+    // Remove that user from current user's following
+    // Remove current user from followers of that user
+
+    const followedUser = await User.findOne({ _id: req.params.user_id });
+    if (!followedUser) return res.status(400).json({ msg: 'User not found' });
+    // console.log(`user id: ${req.user.id}`);
+
+    const me = await User.findById(req.user.id);
+    if (!me) return res.status(400).json({ msg: 'ERROR' });
+
+    const removeIndexFollowers = followedUser.followers
+      .map((follower) => follower.user.toString())
+      .indexOf(req.user.id);
+
+    console.log(removeIndexFollowers);
+
+    followedUser.followers.splice(removeIndexFollowers, 1);
+    await followedUser.save();
+
+    const removeIndexFollowing = me.following
+      .map((following) => following.user.toString())
+      .indexOf(req.params.user_id);
+
+    console.log('OPA' + removeIndexFollowing);
+
+    me.following.splice(removeIndexFollowing, 1);
+    await me.save();
+    /* followedUser.followers.unshift(req.user.id);
+    followedUser.save();
+
+    me.following.unshift(req.params.user_id);
+    me.save(); */
 
     res.json(me);
   } catch (err) {
